@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexapod Robot Controller</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; }
+      button, input[type=range] { margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Hexapod Robot Controller</h1>
+    
+    <div id="controls">
+      <button onclick="moveAll(90)">Neutral Position</button>
+      <button onclick="moveForward()">Move Forward</button>
+      <button onclick="moveBackward()">Move Backward</button>
+      <button onclick="stop()">Stop</button>
+    </div>
+
+    <script>
+      const espIP = 'http://YOUR_ESP32_IP';
+
+      function moveServo(servo, angle){
+        fetch(`${espIP}/move?servo=${servo}&angle=${angle}`)
+          .then(response => response.text())
+          .then(console.log)
+          .catch(console.error);
+      }
+
+      function moveAll(angle){
+        for(let i = 0; i < 18; i++){
+          moveServo(i, angle);
+        }
+      }
+
+      function moveForward(){
+        // Custom logic for forward motion
+        // Example simplified:
+        moveServo(0, 120);
+        moveServo(1, 60);
+        // Add logic for other legs...
+      }
+
+      function moveBackward(){
+        // Custom logic for backward motion
+        moveServo(0, 60);
+        moveServo(1, 120);
+        // Add logic for other legs...
+      }
+
+      function stop(){
+        moveAll(90); // Assume 90 is neutral
+      }
+    </script>
+</body>
+</html>
