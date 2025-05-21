@@ -9,8 +9,10 @@
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
-            text-align: center; 
             background-color: #f4f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         button { 
@@ -22,14 +24,14 @@
 
         #controllerWrapper {
             display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: flex-start;
             gap: 20px;
             flex-wrap: wrap;
         }
 
         #joystickContainer { 
-            display: flex; 
+            display: flex;
             flex-direction: column;
             gap: 20px;
         }
@@ -46,11 +48,11 @@
             border: 2px solid #007BFF;
             border-radius: 10px;
             padding: 15px;
-            width: 300px;
+            width: 250px;
             background-color: #fff;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             position: relative;
-            margin-top: 20px;
+            text-align: center;
         }
 
         .container-title {
@@ -74,8 +76,16 @@
             color: white;
         }
 
+        .selectors-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
         @media (max-width: 700px) {
-            #controllerWrapper {
+            #controllerWrapper, .selectors-row {
                 flex-direction: column;
                 align-items: center;
             }
@@ -86,7 +96,6 @@
     <h1>Hexapod Robot Controller</h1>
 
     <div id="controllerWrapper">
-
         <div id="joystickContainer">
             <div id="joystickLeft" class="joystick"></div>
             <div id="joystickRight" class="joystick"></div>
@@ -99,7 +108,9 @@
             <button onclick="moveBackward()">Move Backward</button>
             <button onclick="stop()">Stop</button>
         </div>
+    </div>
 
+    <div class="selectors-row">
         <div class="selector-container">
             <div class="container-title">Gait Selector</div>
             <button onclick="toggleOptions('gaitOptions')">Select Gait</button>
@@ -121,7 +132,6 @@
                 <button onclick="selectEmote('Clap')">Clap</button>
             </div>
         </div>
-
     </div>
 
     <script>
