@@ -20,37 +20,40 @@
             cursor: pointer;
         }
 
-        #joystickContainer { 
-            display: flex; 
-            justify-content: center; 
+        #controllerWrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
             gap: 20px;
             flex-wrap: wrap;
-            margin-top: 20px; 
+        }
+
+        #joystickContainer { 
+            display: flex; 
+            flex-direction: column;
+            gap: 20px;
         }
 
         .joystick { 
-            flex: 1 1 150px;
-            max-width: 200px;
+            width: 150px;
             height: 150px;
             border: 2px solid #007BFF;
             border-radius: 10px;
             background-color: #fff;
-            margin: 10px;
         }
 
-        .movement-container {
+        .movement-container, .selector-container {
             border: 2px solid #007BFF;
             border-radius: 10px;
             padding: 15px;
-            margin: 20px auto;
-            width: 90%;
-            max-width: 400px;
+            width: 300px;
             background-color: #fff;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             position: relative;
+            margin-top: 20px;
         }
 
-        .movement-container h2 {
+        .container-title {
             position: absolute;
             top: -12px;
             left: 50%;
@@ -61,22 +64,18 @@
             font-size: 18px;
         }
 
-        .gait-options {
+        .options {
             display: none;
             margin-top: 10px;
         }
 
-        .gait-options button.selected {
+        .options button.selected {
             background-color: #007BFF;
             color: white;
         }
 
-        @media (max-width: 600px) {
-            button {
-                width: 100%;
-            }
-
-            #joystickContainer {
+        @media (max-width: 700px) {
+            #controllerWrapper {
                 flex-direction: column;
                 align-items: center;
             }
@@ -86,40 +85,66 @@
 <body>
     <h1>Hexapod Robot Controller</h1>
 
-    <div class="movement-container">
-        <h2>Movement</h2>
-        <div>
+    <div id="controllerWrapper">
+
+        <div id="joystickContainer">
+            <div id="joystickLeft" class="joystick"></div>
+            <div id="joystickRight" class="joystick"></div>
+        </div>
+
+        <div class="movement-container">
+            <div class="container-title">Movement</div>
             <button onclick="moveAll(90)">Neutral Position</button>
             <button onclick="moveForward()">Move Forward</button>
             <button onclick="moveBackward()">Move Backward</button>
             <button onclick="stop()">Stop</button>
         </div>
-        <button onclick="toggleGaitSelector()">Gait Selector</button>
-        <div class="gait-options" id="gaitOptions">
-            <button onclick="selectGait('Triple')">Triple</button>
-            <button onclick="selectGait('Wave')">Wave</button>
-            <button onclick="selectGait('Ripple')">Ripple</button>
-        </div>
-    </div>
 
-    <div id="joystickContainer">
-        <div id="joystickLeft" class="joystick"></div>
-        <div id="joystickRight" class="joystick"></div>
+        <div class="selector-container">
+            <div class="container-title">Gait Selector</div>
+            <button onclick="toggleOptions('gaitOptions')">Select Gait</button>
+            <div class="options" id="gaitOptions">
+                <button onclick="selectGait('Triple')">Triple</button>
+                <button onclick="selectGait('Wave')">Wave</button>
+                <button onclick="selectGait('Ripple')">Ripple</button>
+            </div>
+        </div>
+
+        <div class="selector-container">
+            <div class="container-title">Emote Selector</div>
+            <button onclick="toggleOptions('emoteOptions')">Select Emote</button>
+            <div class="options" id="emoteOptions">
+                <button onclick="selectEmote('Wave')">Wave</button>
+                <button onclick="selectEmote('Wiggle')">Wiggle</button>
+                <button onclick="selectEmote('Dance')">Dance</button>
+                <button onclick="selectEmote('Dig')">Dig</button>
+                <button onclick="selectEmote('Clap')">Clap</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         const espIP = 'http://YOUR_ESP32_IP';
-
         let currentGait = 'Triple';
 
-        function toggleGaitSelector() {
-            const gaitOptions = document.getElementById('gaitOptions');
-            gaitOptions.style.display = gaitOptions.style.display === 'none' ? 'block' : 'none';
+        function toggleOptions(id) {
+            const elem = document.getElementById(id);
+            elem.style.display = elem.style.display === 'none' ? 'block' : 'none';
         }
 
         function selectGait(gait) {
             currentGait = gait;
-            document.querySelectorAll('.gait-options button').forEach(btn => btn.classList.remove('selected'));
+            highlightSelection('gaitOptions');
+        }
+
+        function selectEmote(emote) {
+            console.log(`Emote selected: ${emote}`);
+            highlightSelection('emoteOptions');
+        }
+
+        function highlightSelection(containerId) {
+            document.querySelectorAll(`#${containerId} button`).forEach(btn => btn.classList.remove('selected'));
             event.target.classList.add('selected');
         }
 
@@ -136,55 +161,13 @@
             }
         }
 
-        function moveForward(){
-            moveServo(0, 120);
-            moveServo(1, 60);
-        }
+        function moveForward(){ moveServo(0, 120); moveServo(1, 60); }
+        function moveBackward(){ moveServo(0, 60); moveServo(1, 120); }
+        function stop(){ moveAll(90); }
 
-        function moveBackward(){
-            moveServo(0, 60);
-            moveServo(1, 120);
-        }
+        nipplejs.create({ zone: document.getElementById('joystickLeft'), mode: 'static', position: { left: '50%', top: '50%' }, color: 'blue' });
+        nipplejs.create({ zone: document.getElementById('joystickRight'), mode: 'static', position: { left: '50%', top: '50%' }, color: 'red' });
 
-        function stop(){
-            moveAll(90);
-        }
-
-        const joystickLeft = nipplejs.create({
-            zone: document.getElementById('joystickLeft'),
-            mode: 'static',
-            position: { left: '50%', top: '50%' },
-            color: 'blue'
-        });
-
-        const joystickRight = nipplejs.create({
-            zone: document.getElementById('joystickRight'),
-            mode: 'static',
-            position: { left: '50%', top: '50%' },
-            color: 'red'
-        });
-
-        joystickLeft.on('move', (evt, data) => {
-            const angle = data.angle.degree;
-            if(angle >= 45 && angle <= 135){
-                moveForward();
-            } else if(angle >= 225 && angle <= 315){
-                moveBackward();
-            }
-        });
-
-        joystickLeft.on('end', () => stop());
-
-        joystickRight.on('move', (evt, data) => {
-            const angle = data.angle.degree;
-            if(angle >= 0 && angle <= 180){
-                moveServo(2, 120);
-            } else {
-                moveServo(2, 60);
-            }
-        });
-
-        joystickRight.on('end', () => moveServo(2, 90));
     </script>
 </body>
 </html>
