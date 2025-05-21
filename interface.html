@@ -4,55 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hexapod Robot Controller</title>
+    <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
     <style>
-      body { font-family: Arial, sans-serif; padding: 20px; }
-      button, input[type=range] { margin: 5px; }
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        #joystickContainer { display: flex; justify-content: space-around; margin-top: 20px; }
+        .joystick { width: 150px; height: 150px; }
     </style>
 </head>
 <body>
     <h1>Hexapod Robot Controller</h1>
     
     <div id="controls">
-      <button onclick="moveAll(90)">Neutral Position</button>
-      <button onclick="moveForward()">Move Forward</button>
-      <button onclick="moveBackward()">Move Backward</button>
-      <button onclick="stop()">Stop</button>
+        <button onclick="moveAll(90)">Neutral Position</button>
+        <button onclick="moveForward()">Move Forward</button>
+        <button onclick="moveBackward()">Move Backward</button>
+        <button onclick="stop()">Stop</button>
+    </div>
+
+    <div id="joystickContainer">
+        <div id="joystickLeft" class="joystick"></div>
+        <div id="joystickRight" class="joystick"></div>
     </div>
 
     <script>
-      const espIP = 'http://YOUR_ESP32_IP';
+        const espIP = 'http://YOUR_ESP32_IP';
 
-      function moveServo(servo, angle){
-        fetch(`${espIP}/move?servo=${servo}&angle=${angle}`)
-          .then(response => response.text())
-          .then(console.log)
-          .catch(console.error);
-      }
-
-      function moveAll(angle){
-        for(let i = 0; i < 18; i++){
-          moveServo(i, angle);
+        function moveServo(servo, angle){
+            fetch(`${espIP}/move?servo=${servo}&angle=${angle}`)
+                .then(response => response.text())
+                .then(console.log)
+                .catch(console.error);
         }
-      }
 
-      function moveForward(){
-        // Custom logic for forward motion
-        // Example simplified:
-        moveServo(0, 120);
-        moveServo(1, 60);
-        // Add logic for other legs...
-      }
+        function moveAll(angle){
+            for(let i = 0; i < 18; i++){
+                moveServo(i, angle);
+            }
+        }
 
-      function moveBackward(){
-        // Custom logic for backward motion
-        moveServo(0, 60);
-        moveServo(1, 120);
-        // Add logic for other legs...
-      }
+        function moveForward(){
+            moveServo(0, 120);
+            moveServo(1, 60);
+            // Add other leg servo logic
+        }
 
-      function stop(){
-        moveAll(90); // Assume 90 is neutral
-      }
+        function moveBackward(){
+            moveServo(0, 60);
+            moveServo(1, 120);
+            // Add other leg servo logic
+        }
+
+        function stop(){
+            moveAll(90);
+        }
+
+        // Joystick setup
+        const joystickLeft = nipplejs.create({
+            zone: document.getElementById('joystickLeft'),
+            mode: 'static',
+            position: { left: '50%', top: '50%' },
+            color: 'blue'
+        });
+
+        const joystickRight = nipplejs.create({
+            zone: document.getElementById('joystickRight'),
+            mode: 'static',
+            position: { left: '50%', top: '50%' },
+            color: 'red'
+        });
+
+        joystickLeft.on('move', (evt, data) => {
+            const angle = data.angle.degree;
+            if(angle >= 45 && angle <= 135){
+                moveForward();
+            } else if(angle >= 225 && angle <= 315){
+                moveBackward();
+            }
+        });
+
+        joystickLeft.on('end', () => stop());
+
+        joystickRight.on('move', (evt, data) => {
+            const angle = data.angle.degree;
+            if(angle >= 0 && angle <= 180){
+                moveServo(2, 120); // Example servo control
+            } else {
+                moveServo(2, 60); // Adjust based on your servos
+            }
+        });
+
+        joystickRight.on('end', () => moveServo(2, 90));
+
     </script>
 </body>
 </html>
