@@ -93,16 +93,21 @@
             margin-top: 20px;
         }
 
-        @media (max-width: 700px) {
-            #controllerWrapper {
+        #controllerWrapper {
             display: flex;
-            flex-direction: row-reverse; /* Switch joystick to the right side */
+            flex-direction: row-reverse; /* Joystick to the right */
             align-items: center;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
-}
         }
+
+        @media (max-width: 700px) {
+            #controllerWrapper {
+            flex-direction: column; /* Stack vertically on small screens */
+            }
+        }
+            }
     </style>
 </head>
 <body>
