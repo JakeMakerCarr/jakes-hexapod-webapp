@@ -94,10 +94,14 @@
         }
 
         @media (max-width: 700px) {
-            #controllerWrapper, .selectors-row {
-                flex-direction: column;
-                align-items: center;
-            }
+            #controllerWrapper {
+            display: flex;
+            flex-direction: row-reverse; /* Switch joystick to the right side */
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+}
         }
     </style>
 </head>
@@ -105,19 +109,20 @@
     <h1>Hexapod Robot Controller</h1>
 
     <div id="controllerWrapper">
-        <div id="joystickContainer">
-            <div id="joystickLeft" class="joystick"></div>
-            <div id="joystickRight" class="joystick"></div>
-        </div>
-
-        <div class="movement-container">
-            <div class="container-title">Movement</div>
-            <button onclick="moveAll(90)">Neutral Position</button>
-            <button onclick="moveForward()">Move Forward</button>
-            <button onclick="moveBackward()">Move Backward</button>
-            <button onclick="stop()">Stop</button>
-        </div>
+    <div id="joystickContainer">
+        <div id="joystickRight" class="joystick"></div> <!-- Purple joystick moved to top -->
+        <div id="joystickLeft" class="joystick"></div> <!-- Red joystick stays bottom -->
     </div>
+
+    <div class="movement-container">
+        <div class="container-title">Movement</div>
+        <button onclick="moveAll(90)">Neutral Position</button>
+        <button onclick="moveForward()">Move Forward</button>
+        <button onclick="moveBackward()">Move Backward</button>
+        <button onclick="stop()">Stop</button>
+    </div>
+</div>
+
 
     <div class="selectors-row">
         <div class="selector-container">
